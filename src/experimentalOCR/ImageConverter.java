@@ -6,6 +6,7 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.IntStream;
 
 public class ImageConverter {
@@ -35,18 +36,19 @@ public class ImageConverter {
 	
 	
 	
-	public ArrayList<BufferedImage> segmentation(BufferedImage capture,int segmentIndex){
+	public ArrayList<BufferedImage> segmentation(BufferedImage capture,List<Integer> listSegment){
 		ArrayList<BufferedImage> output = new ArrayList<BufferedImage>();
 		
 		int rectHeight = (int)capture.getHeight()/segmentationNumber;
 		Rectangle rect = new Rectangle((int)capture.getWidth(),rectHeight);
-		IntStream.range(0, segmentationNumber).forEach(
-				nbr-> output.add(capture.getSubimage(0,nbr*rectHeight, rect.width, rect.height))
-				);
-		if(segmentIndex>=0){
-			ArrayList<BufferedImage> targetedOutput = new ArrayList<BufferedImage>();
-			targetedOutput.add(output.get(segmentIndex));
-			return targetedOutput;
+		if(listSegment == null){
+			IntStream.range(0, segmentationNumber).forEach(
+					nbr-> output.add(capture.getSubimage(0,nbr*rectHeight, rect.width, rect.height))
+			);
+		}else{
+			for (Integer segment : listSegment){
+				output.add(capture.getSubimage(0,segment*rectHeight, rect.width, rect.height));
+			}
 		}
 		return output;
 		
@@ -56,10 +58,11 @@ public class ImageConverter {
 		return (countColorAppearances(image) > 0);
 	}
 	
-	public void processImageActif(BufferedImage image) {
+	public Double processImageActif(BufferedImage image) {
 		int countColor = countColorAppearances(image);
 		double percent = countColor / 10;
 		System.out.print("pourcentage : "+percent+" % \r");
+		return percent;
 	}
 	
 	public static int countColorAppearances(BufferedImage image){
